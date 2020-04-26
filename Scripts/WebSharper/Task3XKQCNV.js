@@ -1,7 +1,7 @@
 (function()
 {
  "use strict";
- var Global,Task3XKQCNV,Dto,Weight,User,Client,SC$1,WebSharper,List,Seq,Operators,Charting,Chart,Pervasives,UI,Var$1,Doc,Renderers,ChartJs,AttrProxy,Remoting,AjaxRemotingProvider,DateUtil,Date,IntelliFactory,Runtime;
+ var Global,Task3XKQCNV,Dto,Weight,User,Client,SC$1,WebSharper,UI,Var$1,Remoting,AjaxRemotingProvider,List,Charting,Chart,Pervasives,Doc,Renderers,ChartJs,AttrProxy,Seq,DateUtil,Operators,Date,IntelliFactory,Runtime;
  Global=self;
  Task3XKQCNV=Global.Task3XKQCNV=Global.Task3XKQCNV||{};
  Dto=Task3XKQCNV.Dto=Task3XKQCNV.Dto||{};
@@ -10,21 +10,21 @@
  Client=Task3XKQCNV.Client=Task3XKQCNV.Client||{};
  SC$1=Global.StartupCode$Task3XKQCNV$Client=Global.StartupCode$Task3XKQCNV$Client||{};
  WebSharper=Global.WebSharper;
+ UI=WebSharper&&WebSharper.UI;
+ Var$1=UI&&UI.Var$1;
+ Remoting=WebSharper&&WebSharper.Remoting;
+ AjaxRemotingProvider=Remoting&&Remoting.AjaxRemotingProvider;
  List=WebSharper&&WebSharper.List;
- Seq=WebSharper&&WebSharper.Seq;
- Operators=WebSharper&&WebSharper.Operators;
  Charting=WebSharper&&WebSharper.Charting;
  Chart=Charting&&Charting.Chart;
  Pervasives=Charting&&Charting.Pervasives;
- UI=WebSharper&&WebSharper.UI;
- Var$1=UI&&UI.Var$1;
  Doc=UI&&UI.Doc;
  Renderers=Charting&&Charting.Renderers;
  ChartJs=Renderers&&Renderers.ChartJs;
  AttrProxy=UI&&UI.AttrProxy;
- Remoting=WebSharper&&WebSharper.Remoting;
- AjaxRemotingProvider=Remoting&&Remoting.AjaxRemotingProvider;
+ Seq=WebSharper&&WebSharper.Seq;
  DateUtil=WebSharper&&WebSharper.DateUtil;
+ Operators=WebSharper&&WebSharper.Operators;
  Date=Global.Date;
  IntelliFactory=Global.IntelliFactory;
  Runtime=IntelliFactory&&IntelliFactory.Runtime;
@@ -46,24 +46,7 @@
  };
  Client.Main=function()
  {
-  var chart,rvLoginUsername,rvLoginName,rvLoginPassword,rvRegUsername,rvRegName,rvRegPassword,rvRegPasswordTry,rvLogPublished,rvLogWeight;
-  List.ofSeq(Seq.delay(function()
-  {
-   return Seq.map(Global.id,Operators.range(1,9));
-  }));
-  chart=Chart.Line$1(List.ofSeq(Seq.delay(function()
-  {
-   return Seq.map(function(x)
-   {
-    return[Global.String(x),x*x];
-   },Operators.range(1,9));
-  }))).__WithTitle("Square numbers").__WithFillColor(new Pervasives.Color({
-   $:0,
-   $0:120,
-   $1:120,
-   $2:120,
-   $3:0.2
-  }));
+  var rvLoginUsername,rvLoginName,rvLoginPassword,rvRegUsername,rvRegName,rvRegPassword,rvRegPasswordTry,rvLogPublished,rvLogWeight,data_unfinished,datafixed,chart;
   Var$1.Create$1("");
   rvLoginUsername=Var$1.Create$1("");
   rvLoginName=Var$1.Create$1("");
@@ -74,6 +57,18 @@
   rvRegPasswordTry=Var$1.Create$1("");
   rvLogPublished=Var$1.Create$1((new Global.Date(Client.timeNow())).toLocaleString());
   rvLogWeight=Var$1.Create$1("5");
+  data_unfinished=(new AjaxRemotingProvider.New()).Sync("Task3XKQCNV:Task3XKQCNV.Server.AllWeightsChart:-1363325819",[]);
+  datafixed=List.map(function(x)
+  {
+   return[(new Global.Date(x.Published)).toLocaleString(),x.Weight];
+  },data_unfinished);
+  chart=Chart.Line$1(datafixed).__WithTitle("Square numbers").__WithFillColor(new Pervasives.Color({
+   $:0,
+   $0:120,
+   $1:120,
+   $2:120,
+   $3:0.2
+  }));
   return Doc.Element("div",[],[ChartJs.Render$8(chart,null,null,null),Doc.Element("table",[AttrProxy.Create("id","loginform"),AttrProxy.Create("border","2"),AttrProxy.Create("style","margin: auto;\n            width: 80%;\n            padding: 10px;\n            padding-bottom: 70px;\n            margin-bottom: 60px;")],List.ofSeq(Seq.delay(function()
   {
    var style;
@@ -173,7 +168,11 @@
      {
       theDate=DateUtil.Parse(rvLogPublished.Get());
       (new AjaxRemotingProvider.New()).Send("Task3XKQCNV:Task3XKQCNV.Server.AddWeight:38517317",[rvLoginUsername.Get(),Operators.toInt(Global.Number(rvLogWeight.Get())),theDate]);
-      Global.alert("New book added!");
+      Global.alert("Weight logged!");
+      chart.__UpdateData(50,function()
+      {
+       return Global.Number(rvLogWeight.Get());
+      });
      }
    })])];
   })))])]);

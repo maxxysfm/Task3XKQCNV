@@ -15,17 +15,7 @@ module Client =
     
     [<SPAEntryPoint>]
     let Main () =
-
-        let data = [for x in 1.0 .. 9.0 -> (string x + "^2", x * x)]
-
-        // Egy tökéletes világban, feltöltöm a chart adatait a lekérdezett értékekkel! :)        
-        let data_unfinished = Server.AllWeightsChart
-
-        let chart =
-            Chart.Line(data)
-              .WithTitle("Square numbers")
-              .WithFillColor(Color.Rgba(120, 120, 120, 0.2))
-
+    
         // Test
         let rvTEMP = Var.Create ""
         
@@ -44,6 +34,16 @@ module Client =
 
         let rvLogPublished = Var.Create (string timeNow)
         let rvLogWeight = Var.Create "5"
+
+        let mutable data_unfinished = Server.AllWeightsChart()
+        
+        let mutable datafixed = data_unfinished |> List.map(fun x -> string x.Published, float x.Weight )
+        
+        let mutable chart =
+            Chart.Line(datafixed)
+                .WithTitle("Square numbers")
+                .WithFillColor(Color.Rgba(120, 120, 120, 0.2))
+
 
         div [] [
             
@@ -239,7 +239,8 @@ module Client =
                     else
                         let theDate = System.DateTime.Parse(rvLogPublished.Value)
                         Server.AddWeight(rvLoginUsername.Value,(int rvLogWeight.Value),theDate)
-                        JS.Alert("New book added!")
+                        JS.Alert("Weight logged!")
+                        //chart.UpdateData(50,fun _ -> (float rvLogWeight.Value))
                     )
                 ]
             ]
